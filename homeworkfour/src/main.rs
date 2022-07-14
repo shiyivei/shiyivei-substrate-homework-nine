@@ -1,29 +1,45 @@
-use homeworkfour::calculate_area;
+use homeworkfour::question2::sum_u32;
+use homeworkfour::question3::calculate_area;
+use homeworkfour::question3::{Circle, Square, Triangle};
 use homeworkfour::TrafficLight;
-use homeworkfour::{Circle, Square, Triangle};
 
 const U32_MAX: u32 = std::u32::MAX;
 
 fn main() {
+    // 题目1
     let red_light = TrafficLight::Red;
     red_light.waiting_time();
     TrafficLight::Green.waiting_time();
     TrafficLight::Yellow.waiting_time();
 
-    // 求u32的和
+    println!("--------------------------------");
 
-    let vec = vec![U32_MAX - 1, 1];
+    // 题目2
 
-    let sum = sum_u32(&vec);
-    match sum {
-        Some(v) => println!("The sum Option enum is {:?}", Some(v)),
+    let vec1 = vec![U32_MAX, 1];
+    let sum1 = sum_u32(&vec1);
+    match sum1 {
+        Some(v) => println!("Test1: The sum Option enum is {:?}", Some(v)),
         None => {
-            println!("The result is overflow");
+            println!("Test1: The result is overflow");
             ()
         }
     };
 
-    // 计算面积
+    let vec2 = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    let sum2 = sum_u32(&vec2);
+
+    match sum2 {
+        Some(v) => println!("Test2: The sum Option enum is {:?}", Some(v)),
+        None => {
+            println!("Test2: The result is overflow");
+            ()
+        }
+    };
+
+    println!("--------------------------------");
+
+    // 题目3 计算面积
 
     let triangle = Triangle {
         base: 3.0,
@@ -37,15 +53,4 @@ fn main() {
     println!("The area of triangle is {}", calculate_area(triangle));
     println!("The area of square is {}", calculate_area(square));
     println!("The area of circle is {}", calculate_area(circle));
-}
-
-//题目2   u32 类型求和
-pub fn sum_u32(vec: &[u32]) -> Option<u32> {
-    let mut sum = 0;
-
-    for i in vec.iter() {
-        sum += i;
-    }
-
-    sum.checked_add(0)
 }
