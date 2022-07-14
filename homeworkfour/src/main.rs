@@ -2,6 +2,7 @@ use homeworkfour::question2::sum_u32;
 use homeworkfour::question3::calculate_area;
 use homeworkfour::question3::{Circle, Square, Triangle};
 use homeworkfour::TrafficLight;
+use homeworkfour::TrafficLightTrait;
 
 const U32_MAX: u32 = std::u32::MAX;
 

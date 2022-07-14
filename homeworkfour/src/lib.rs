@@ -7,9 +7,14 @@ pub enum TrafficLight {
     Green,
 }
 
-//枚举方法，返回每个每个分支的结果
-impl TrafficLight {
-    pub fn waiting_time(&self) -> i32 {
+//定义trait
+pub trait TrafficLightTrait {
+    fn waiting_time(&self) -> u32;
+}
+
+//为枚举实现trait，返回每个可能值的结果
+impl TrafficLightTrait for TrafficLight {
+    fn waiting_time(&self) -> u32 {
         match self {
             TrafficLight::Red => {
                 println!("The red light is needed to waiting for {} seconds", 18);

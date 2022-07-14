@@ -36,7 +36,7 @@ impl Area for Triangle {
     }
 }
 
-//定义函数，要求类型必须实现Area trait
-pub fn calculate_area<T: Area>(graphics: T) -> f64 {
-    graphics.area()
+//求图形面积的函数，接收实现了特定trait的泛型参数
+pub fn calculate_area<T: Area>(graphic: T) -> f64 {
+    graphic.area()
 }
