@@ -10,11 +10,8 @@ import {
 import "@polkadot/api-augment";
 
 const WEB_SOCKET = "ws://localhost:9944";
-// const sleep = (ms) =>
-//   new Promise((resolve) =>
-//     setTimeout(resolve, ms)
-//   );
 
+//定义睡眠函数
 function delay(ms: number) {
   return new Promise((resolve) =>
     setTimeout(resolve, ms)
@@ -22,7 +19,6 @@ function delay(ms: number) {
 }
 
 //connect substrate chain
-
 const connectSubstrate = async () => {
   const wsProvider = new WsProvider(WEB_SOCKET);
   const api = await ApiPromise.create({
@@ -52,7 +48,7 @@ const getFreeBalance = async (
   return aliceAccount["data"]["free"].toHuman();
 };
 
-//获取动态数据
+//获取动态数据（账户余额）
 const printBalance = async (api: ApiPromise) => {
   const keyring = new Keyring({
     type: "sr25519",
@@ -70,6 +66,7 @@ const printBalance = async (api: ApiPromise) => {
   );
 };
 
+//订阅数据变更
 const subscribeAliceBalance = async (
   api: ApiPromise
 ) => {
@@ -96,7 +93,7 @@ const getMetadata = async (api: ApiPromise) => {
   return metadata;
 };
 
-//执行操作
+//转账
 const transFromAliceToBob = async (
   api: ApiPromise,
   amount: number
@@ -115,22 +112,72 @@ const transFromAliceToBob = async (
     });
 };
 
+//订阅Event
+const subscribeClaimCreatedEvent = async (
+  api: ApiPromise,
+  data: any
+) => {
+  const keyring = new Keyring({
+    type: "sr25519",
+  });
+  const alice = keyring.addFromUri("//Alice");
+
+  api.tx.poeModule
+    .createClaim(data)
+    .signAndSend(
+      alice,
+      ({ events = [], status, txHash }) => {
+        console.log(
+          `Current status is ${status.type}`
+        );
+
+        if (status.isFinalized) {
+          console.log(
+            `Transaction included at blockHash ${status.asFinalized}`
+          );
+          console.log(
+            `Transaction hash ${txHash.toHex()}`
+          );
+
+          // Loop through Vec<EventRecord> to display all events
+          events.forEach(
+            ({
+              phase,
+              event: { data, method, section },
+            }) => {
+              console.log(
+                `${phase.toString()} : ${section}.${method} ${data.toString()}`
+              );
+            }
+          );
+
+          subscribeClaimCreatedEvent(api, data);
+        }
+      }
+    );
+};
+
 //在main函数中调用connectSubstrate函数
 const main = async () => {
   const api = await connectSubstrate();
-  console.log(
-    "const value existentialDeposit is:",
-    await getConstants(api)
-  );
-  await printBalance(api);
-  await transFromAliceToBob(api, 10 ** 12);
-  await delay(6000);
+  // console.log(
+  //   "const value existentialDeposit is:",
+  //   await getConstants(api)
+  // );
+  // await printBalance(api);
+  // await transFromAliceToBob(api, 10 ** 12);
+  // await delay(6000);
 
-  await printBalance(api);
-  await subscribeAliceBalance(api);
-  await delay(6000);
+  // await printBalance(api);
+  // await subscribeAliceBalance(api);
+  // await delay(6000);
 
-  await getMetadata(api);
+  // await getMetadata(api);
+
+  // 订阅Event
+  const data = "0x30";
+  await subscribeClaimCreatedEvent(api, data);
+  await delay(12000);
   console.log("game over");
 };
 
